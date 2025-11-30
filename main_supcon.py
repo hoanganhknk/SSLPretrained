@@ -6,7 +6,9 @@ import argparse
 import time
 import math
 
-import tensorboard_logger as tb_logger
+# import tensorboard_logger as tb_logger   # ❌ bỏ đi
+from torch.utils.tensorboard import SummaryWriter  # ✅ dùng TensorBoard chuẩn
+
 import torch
 import torch.backends.cudnn as cudnn
 from torchvision import transforms, datasets
@@ -264,8 +266,8 @@ def main():
     # build optimizer
     optimizer = set_optimizer(opt, model)
 
-    # tensorboard
-    logger = tb_logger.Logger(logdir=opt.tb_folder, flush_secs=2)
+    # tensorboard: dùng SummaryWriter thay cho tensorboard_logger
+    logger = SummaryWriter(log_dir=opt.tb_folder, flush_secs=2)
 
     # training routine
     for epoch in range(1, opt.epochs + 1):
@@ -278,8 +280,8 @@ def main():
         print('epoch {}, total time {:.2f}'.format(epoch, time2 - time1))
 
         # tensorboard logger
-        logger.log_value('loss', loss, epoch)
-        logger.log_value('learning_rate', optimizer.param_groups[0]['lr'], epoch)
+        logger.add_scalar('loss', loss, epoch)
+        logger.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
         if epoch % opt.save_freq == 0:
             save_file = os.path.join(
@@ -290,6 +292,8 @@ def main():
     save_file = os.path.join(
         opt.save_folder, 'last.pth')
     save_model(model, optimizer, opt, opt.epochs, save_file)
+
+    logger.close()
 
 
 if __name__ == '__main__':
