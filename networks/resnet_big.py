@@ -7,6 +7,7 @@ Adapted from: https://github.com/bearpaw/pytorch-classification
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from .resnet_cifar32 import resnet32_cifar
 
 
 class BasicBlock(nn.Module):
@@ -141,6 +142,7 @@ def resnet101(**kwargs):
 
 
 model_dict = {
+    'resnet32': resnet32_cifar,
     'resnet18': [resnet18, 512],
     'resnet34': [resnet34, 512],
     'resnet50': [resnet50, 2048],
